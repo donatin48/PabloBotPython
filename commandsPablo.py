@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 import random
 import time
-from langdetect import detect , DetectorFactory
+from langdetect import detect 
 from translate import Translator
 
 async def delete(self,ctx):
@@ -40,14 +40,18 @@ class CogCommand(commands.Cog):
 
     @commands.command()
     async def book(self,ctx, nbr: int):
-        livre = ""
-        alpha = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-        for c in range(int(nbr)) :
-            livre =  livre + random.choice(alpha)
-            c = c
         await delete(self,ctx)
-        await ctx.send(f"{livre}", delete_after=5)
-        print(f"[Book] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> {nbr} ")
+        if nbr > 2000 :
+            await ctx.send(">2000 🐷", delete_after=5)
+            pass
+        else :
+            livre = ""
+            alpha = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
+            for c in range(int(nbr)) :
+                livre =  livre + random.choice(alpha)
+                c = c
+            await ctx.send(f"{livre}", delete_after=5)
+            print(f"[Book] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> {nbr} ")
 
 
         
@@ -66,8 +70,7 @@ class CogCommand(commands.Cog):
         print(f"[Help] [{time.strftime('%H:%M:%S')}] : {ctx.author.name}")
         
     @commands.command()
-    async def trad(self,ctx, arg1 :str, arg2 : str):
-        DetectorFactory.seed = 0
+    async def trad(self,ctx, arg1 :str, *arg2 : str):
         await delete(self,ctx)
         trad = " ".join(arg2)
         det = detect(trad)
@@ -75,5 +78,4 @@ class CogCommand(commands.Cog):
         traduction = gs.translate(trad)
         await ctx.send(traduction, delete_after=15)
         print(f"[Traduction] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} ({det} --> {arg1}) : {trad} --> {traduction} ")
-
         
