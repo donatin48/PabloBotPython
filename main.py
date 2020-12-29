@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import random
-import commandsPablo 
+import cogs.commandsPablo
 import datetime , time
 
 bot = commands.Bot(command_prefix="!")
