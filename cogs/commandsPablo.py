@@ -4,6 +4,7 @@ import random
 import time
 from langdetect import detect 
 from translate import Translator
+import requests
 
 async def delete(self,ctx):
     if isinstance(ctx.channel, discord.channel.DMChannel):
@@ -68,7 +69,7 @@ class CogCommand(commands.Cog):
         embed.add_field(name="!trad",value="!trad + en,de,... + chaine à traduire --> Traduit ",inline=False)
         await ctx.send(embed=embed, delete_after=10)
         print(f"[Help] [{time.strftime('%H:%M:%S')}] : {ctx.author.name}")
-        
+ 
     @commands.command()
     async def trad(self,ctx, arg1 :str, *arg2 : str):
         await delete(self,ctx)
@@ -78,4 +79,14 @@ class CogCommand(commands.Cog):
         traduction = gs.translate(trad)
         await ctx.send(traduction, delete_after=15)
         print(f"[Traduction] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} ({det} --> {arg1}) : {trad} --> {traduction} ")
+
+    @commands.command()
+    async def fox(self,ctx):
+        await delete(self,ctx)
+        reponse = requests.get("https://randomfox.ca/floof/")
+        fox = reponse.json()
+        embed = discord.Embed(colour = discord.Colour.dark_blue())
+        embed.set_image(url=fox['image'])
+        await ctx.send(embed=embed,delete_after=8)
+        print(f"[Fox] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} ")
         

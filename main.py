@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import random
-from cogs import commandsPablo
+from cogs import commandsPablo , level
 
 import datetime , time
 
@@ -35,11 +35,13 @@ async def on_command_error(ctx,error):
         await commandsPablo.delete("",ctx)
 
 cogs = [
-    commandsPablo.CogCommand(bot)
+    commandsPablo.CogCommand(bot),
+    # level.Levels(bot)
 ]
 for cog in cogs :
     bot.add_cog(cog)
-with open("config.ini","r",encoding="UTF-8") as r:
+
+with open("db/config.ini","r",encoding="UTF-8") as r:
     key = r.read()
     r.close
 bot.run(key)
