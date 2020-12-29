@@ -35,7 +35,6 @@ async def on_command_error(ctx,error):
 cogs = [
     commandsPablo.CogCommand(bot)
 ]
-
 for cog in cogs :
     bot.add_cog(cog)
 with open("config.ini","r",encoding="UTF-8") as r:

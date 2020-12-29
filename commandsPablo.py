@@ -30,6 +30,7 @@ class CogCommand(commands.Cog):
         else:
             await ctx.send(p,delete_after=5)
         print(f"[Python] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} {c} --> {p}")
+        
     @commands.command(name="random")
     async def randomm(self,ctx, nbr : int):
         rand =  random.randint(0,nbr)
@@ -65,7 +66,7 @@ class CogCommand(commands.Cog):
         print(f"[Help] [{time.strftime('%H:%M:%S')}] : {ctx.author.name}")
         
     @commands.command()
-    async def trad(self,ctx, arg1 :str, *arg2: str):
+    async def trad(self,ctx, arg1 :str, arg2 : str):
         DetectorFactory.seed = 0
         await delete(self,ctx)
         trad = " ".join(arg2)
