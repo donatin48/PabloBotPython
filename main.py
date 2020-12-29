@@ -12,6 +12,7 @@ async def on_ready():
     print('Logged in as')
     print(bot.user.name)
     print(bot.user.id)
+    print(f"connecté à {len(bot.guilds)} server(s) ")
     print('-------------------')
     # today = date.today()
     today = datetime.datetime.now()
