@@ -70,6 +70,7 @@ class CogCommand(commands.Cog):
         embed.add_field(name="!fox",value="!fox --> Donne un renard aléatoire ",inline=False)
         embed.add_field(name="!dog",value="!dog --> Donne un chien aléatoire ",inline=False)
         embed.add_field(name="!lyr",value="!lyr + artiste + titre --> Donne les lyrics ",inline=False)
+        embed.add_field(name="!meteo",value="!meteo + ville + J+? --> Donne la méteo ",inline=False)
         
         await ctx.send(embed=embed, delete_after=10)
         print(f"[Help] [{time.strftime('%H:%M:%S')}] : {ctx.author.name}")
@@ -101,8 +102,6 @@ class CogCommand(commands.Cog):
         print(artist,title)
         reponse = requests.get(f"https://api.lyrics.ovh/v1/{artist}/{title}")
         lyrics = reponse.json()
-        # embed = discord.Embed(colour = discord.Colour.dark_red())
-        # embed.add_field(name="Lyrics",value=lyrics)
         await ctx.send(lyrics['lyrics'],delete_after=15)
         print(f"[Lyrics] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} ")
 
@@ -115,4 +114,13 @@ class CogCommand(commands.Cog):
         embed.set_image(url=dog['url'])
         await ctx.send(embed=embed,delete_after=10)
         print(f"[Dog] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} ")
-        
+
+    @commands.command()
+    async def meteo(self,ctx,ville : str,jour =0):
+        await delete(self,ctx)
+        reponse = f"https://www.prevision-meteo.ch/uploads/widget/{ville}_{jour}.png "
+        print(reponse)
+        embed = discord.Embed(colour = discord.Colour.blue())
+        embed.set_image(url=reponse)
+        await ctx.send(reponse,delete_after=10)
+        print(f"[Meteo] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} {ville} & {jour} ")
