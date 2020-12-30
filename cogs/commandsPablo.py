@@ -116,11 +116,8 @@ class CogCommand(commands.Cog):
         print(f"[Dog] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} ")
 
     @commands.command()
-    async def meteo(self,ctx,ville : str,jour =0):
+    async def meteo(self,ctx,ville ="andresy",jour =0):
         await delete(self,ctx)
         reponse = f"https://www.prevision-meteo.ch/uploads/widget/{ville}_{jour}.png "
-        print(reponse)
-        embed = discord.Embed(colour = discord.Colour.blue())
-        embed.set_image(url=reponse)
         await ctx.send(reponse,delete_after=10)
         print(f"[Meteo] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} {ville} & {jour} ")
