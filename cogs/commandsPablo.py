@@ -13,6 +13,18 @@ async def delete(self,ctx):
     else :
         await ctx.message.delete() 
 
+ydl_opts = {
+'format': 'bestaudio/best',
+'postprocessors': [{
+    'key': 'FFmpegExtractAudio',
+    'preferredcodec': 'mp3',
+    'preferredquality': '192',
+}],
+}   
+
+def endSong(self,guild, path):
+    os.remove(path)    
+
 class CogCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
@@ -125,17 +137,7 @@ class CogCommand(commands.Cog):
 
 
     
-    ydl_opts = {
-    'format': 'bestaudio/best',
-    'postprocessors': [{
-        'key': 'FFmpegExtractAudio',
-        'preferredcodec': 'mp3',
-        'preferredquality': '192',
-    }],
-}   
-
-    def endSong(guild, path):
-        os.remove(path)      
+  
     @commands.command(pass_context=True)
     async def p(self,ctx,*url):
         await delete(self,ctx)
@@ -154,7 +156,7 @@ class CogCommand(commands.Cog):
             file = ydl.extract_info(url, download=True)
             path = str(file['title']) + "-" + str(file['id'] + ".mp3")
 
-        voice_client.play(discord.FFmpegPCMAudio(path), after=lambda x: endSong(guild, path))
+        voice_client.play(discord.FFmpegPCMAudio(path), after=lambda x: endSong("",guild, path))
         voice_client.source = discord.PCMVolumeTransformer(voice_client.source, 1)
 
         await ctx.send(f'**Music: **{url}')
