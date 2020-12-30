@@ -67,6 +67,9 @@ class CogCommand(commands.Cog):
         embed.add_field(name="!book",value="!book + un entier --> Chaine de caractère(s) entre 0 et ...",inline=False)
         embed.add_field(name="!cal",value="!cal + ? --> Fait une opération python",inline=False)
         embed.add_field(name="!trad",value="!trad + en,de,... + chaine à traduire --> Traduit ",inline=False)
+        embed.add_field(name="!fox",value="!fox --> Donne un renard aléatoire ",inline=False)
+        embed.add_field(name="!lyr",value="!lyr + artiste + titre --> Donne les lyrics ",inline=False)
+        
         await ctx.send(embed=embed, delete_after=10)
         print(f"[Help] [{time.strftime('%H:%M:%S')}] : {ctx.author.name}")
  
@@ -90,3 +93,15 @@ class CogCommand(commands.Cog):
         await ctx.send(embed=embed,delete_after=8)
         print(f"[Fox] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} ")
         
+    @commands.command()
+    async def lyr(self,ctx,artist : str, *title):
+        await delete(self,ctx)
+        title = " ".join(title)
+        print(artist,title)
+        reponse = requests.get(f"https://api.lyrics.ovh/v1/{artist}/{title}")
+        lyrics = reponse.json()
+        # embed = discord.Embed(colour = discord.Colour.dark_red())
+        # embed.add_field(name="Lyrics",value=lyrics)
+
+        await ctx.send(lyrics['lyrics'],delete_after=15)
+        print(f"[Lyrics] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} ")
