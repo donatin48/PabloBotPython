@@ -68,6 +68,7 @@ class CogCommand(commands.Cog):
         embed.add_field(name="!cal",value="!cal + ? --> Fait une opération python",inline=False)
         embed.add_field(name="!trad",value="!trad + en,de,... + chaine à traduire --> Traduit ",inline=False)
         embed.add_field(name="!fox",value="!fox --> Donne un renard aléatoire ",inline=False)
+        embed.add_field(name="!dog",value="!dog --> Donne un chien aléatoire ",inline=False)
         embed.add_field(name="!lyr",value="!lyr + artiste + titre --> Donne les lyrics ",inline=False)
         
         await ctx.send(embed=embed, delete_after=10)
@@ -90,7 +91,7 @@ class CogCommand(commands.Cog):
         fox = reponse.json()
         embed = discord.Embed(colour = discord.Colour.dark_blue())
         embed.set_image(url=fox['image'])
-        await ctx.send(embed=embed,delete_after=8)
+        await ctx.send(embed=embed,delete_after=10)
         print(f"[Fox] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} ")
         
     @commands.command()
@@ -102,6 +103,16 @@ class CogCommand(commands.Cog):
         lyrics = reponse.json()
         # embed = discord.Embed(colour = discord.Colour.dark_red())
         # embed.add_field(name="Lyrics",value=lyrics)
-
         await ctx.send(lyrics['lyrics'],delete_after=15)
         print(f"[Lyrics] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} ")
+
+    @commands.command()
+    async def dog(self,ctx):
+        await delete(self,ctx)
+        reponse = requests.get("https://random.dog/woof.json")
+        dog = reponse.json()
+        embed = discord.Embed(colour = discord.Colour.dark_orange())
+        embed.set_image(url=dog['url'])
+        await ctx.send(embed=embed,delete_after=10)
+        print(f"[Dog] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} ")
+        
