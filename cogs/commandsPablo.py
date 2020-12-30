@@ -5,6 +5,7 @@ import time
 from langdetect import detect 
 from translate import Translator
 import requests
+import youtube_dl
 
 async def delete(self,ctx):
     if isinstance(ctx.channel, discord.channel.DMChannel):
@@ -121,3 +122,39 @@ class CogCommand(commands.Cog):
         reponse = f"https://www.prevision-meteo.ch/uploads/widget/{ville}_{jour}.png "
         await ctx.send(reponse,delete_after=10)
         print(f"[Meteo] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} {ville} & {jour} ")
+
+
+    
+    ydl_opts = {
+    'format': 'bestaudio/best',
+    'postprocessors': [{
+        'key': 'FFmpegExtractAudio',
+        'preferredcodec': 'mp3',
+        'preferredquality': '192',
+    }],
+}   
+
+    def endSong(guild, path):
+        os.remove(path)      
+    @commands.command(pass_context=True)
+    async def p(self,ctx,*url):
+        await delete(self,ctx)
+        if not ctx.message.author.voice:
+            await ctx.send('you are not connected to a voice channel')
+            return
+
+        else:
+            channel = ctx.message.author.voice.channel
+
+        voice_client = await channel.connect()
+
+        guild = ctx.message.guild
+
+        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+            file = ydl.extract_info(url, download=True)
+            path = str(file['title']) + "-" + str(file['id'] + ".mp3")
+
+        voice_client.play(discord.FFmpegPCMAudio(path), after=lambda x: endSong(guild, path))
+        voice_client.source = discord.PCMVolumeTransformer(voice_client.source, 1)
+
+        await ctx.send(f'**Music: **{url}')

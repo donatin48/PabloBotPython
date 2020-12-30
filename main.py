@@ -2,11 +2,10 @@ import discord
 from discord.ext import commands
 import random
 from cogs import commandsPablo , level
-
 import datetime , time
+# import youtube_dl
 
 bot = commands.Bot(command_prefix="!")
-# client = discord.Client()
 bot.remove_command("help")
 @bot.event
 async def on_ready():
@@ -15,14 +14,8 @@ async def on_ready():
     print(bot.user.id)
     print(f"connecté à {len(bot.guilds)} server(s) ")
     print('-------------------')
-    # today = date.today()
     today = datetime.datetime.now()
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{today} 🐧"))
-
-    general = bot.get_channel(764558994881904662)
-    await general.connect()
-    # generalm = bot.get_channel(303520736553992192)
-    # await generalm.send("J'ai un gros pénis", delete_after=5)
 
 @bot.event
 async def on_command_error(ctx,error):
