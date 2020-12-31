@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import random
-from cogs import commandsPablo , level
+from cogs import commandsPablo 
 import datetime , time
 # import youtube_dl
 
@@ -16,6 +16,8 @@ async def on_ready():
     print('-------------------')
     today = datetime.datetime.now()
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{today} 🐧"))
+    general = bot.get_channel(560515425666990100)
+    await general.connect()
 
 @bot.event
 async def on_command_error(ctx,error):
