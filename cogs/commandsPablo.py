@@ -5,7 +5,7 @@ import time
 from langdetect import detect 
 from translate import Translator
 import requests
-import youtube_dl
+# import youtube_dl
 import os
 import mal
 
@@ -85,7 +85,7 @@ class CogCommand(commands.Cog):
         embed.add_field(name="!dog",value="!dog --> Donne un chien aléatoire ",inline=False)
         embed.add_field(name="!lyr",value="!lyr + artiste + titre --> Donne les lyrics ",inline=False)
         embed.add_field(name="!meteo",value="!meteo + ville + J+? --> Donne la méteo ",inline=False)
-        embed.add_field(name="!op",value="!op + nom (ou id my anime list)--> Donne l'opening ",inline=False)
+        embed.add_field(name="!op",value="!op + nom (ou id my anime list) --> Donne l'opening ",inline=False)
         
         await ctx.send(embed=embed, delete_after=10)
         print(f"[Help] [{time.strftime('%H:%M:%S')}] : {ctx.author.name}")
@@ -170,39 +170,43 @@ class CogCommand(commands.Cog):
                 ls_msg = list(msg)
                 del ls_msg[-1]
                 msg = tuple(ls_msg)
-
         msgg = " ".join(msg)
         if is_integer(msgg) :
             search = int(msgg)
         else :
             search = mal.AnimeSearch(msgg)
             search = search.results[0].mal_id
-            print(search)
+        print(search)
         reponse = requests.get(f"https://animethemes-api.herokuapp.com/api/v1/anime/{search}")
         reponse = reponse.json()
         r = reponse
-        reponse = reponse["themes"][0]["mirrors"][0]
-        for c , v in reponse.items() :
-            if c == "mirror" :
-                reponse = v
-                break
-        if len(mm) >= 2 :
-            try :
-                int(mm[-1])
-            except :
-                pass
-            else :
-                intt = int(mm[-1])
-                r = reponse[0:-6:]
-                rr = reponse[-5::]
-                reponse = r + str(intt) + rr
-        try :
-            titre = reponse[30:-9:]
-            op = reponse[-8:-5:]
+        try:
+            reponse = reponse["themes"][0]["mirrors"][0]
         except :
-            titre = ""
-            op = ""
-        await ctx.send(titre,delete_after=29.5)
-        await ctx.send(op,delete_after=29)
-        await ctx.send(reponse,delete_after=28.5)
-        print(f"[OP] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> {reponse} | {msgg} | {search}")
+            await ctx.send(f"J'ai pas trouvé {str(msg)[2:-2:]} 🍉",delete_after=10)
+            print(f"[OP:Erreur] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> erreur : {str(msg)[2:-2:]}")
+        else:
+            for c , v in reponse.items() :
+                if c == "mirror" :
+                    reponse = v
+                    break
+            if len(mm) >= 2 :
+                try :
+                    int(mm[-1])
+                except :
+                    pass
+                else :
+                    intt = int(mm[-1])
+                    r = reponse[0:-6:]
+                    rr = reponse[-5::]
+                    reponse = r + str(intt) + rr
+            try :
+                titre = reponse[30:-9:]
+                op = reponse[-8:-5:]
+            except :
+                titre = ""
+                op = ""
+            await ctx.send(titre,delete_after=99.5)
+            await ctx.send(op,delete_after=99)
+            await ctx.send(reponse,delete_after=98.5)
+            print(f"[OP] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> {op} | {titre} | {search}")
