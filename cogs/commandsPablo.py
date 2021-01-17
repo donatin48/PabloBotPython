@@ -7,6 +7,7 @@ from translate import Translator
 import requests
 import youtube_dl
 import os
+import mal
 
 async def delete(self,ctx):
     if isinstance(ctx.channel, discord.channel.DMChannel):
@@ -14,17 +15,16 @@ async def delete(self,ctx):
     else :
         await ctx.message.delete() 
 
-ydl_opts = {
-'format': 'bestaudio/best',
-'postprocessors': [{
-    'key': 'FFmpegExtractAudio',
-    'preferredcodec': 'mp3',
-    'preferredquality': '192',
-}],
-}   
-
 def endSong(self,guild, path):
     os.remove(path)    
+
+def is_integer(n):
+    try:
+        float(n)
+    except ValueError:
+        return False
+    else:
+        return float(n).is_integer()
 
 class CogCommand(commands.Cog):
     def __init__(self, bot):
@@ -154,3 +154,54 @@ class CogCommand(commands.Cog):
     #         voice_client.source = discord.PCMVolumeTransformer(voice_client.source, 1)
 
     #         await ctx.send(f'**Music: **{url}')
+
+    @commands.command()
+    async def op(self,ctx,*msg ):
+        await delete(self,ctx)
+        mm = ""
+        if len(msg) >= 2 :
+            try :
+                int(msg[-1])
+            except :
+                pass
+            else :
+                mm = msg
+                ls_msg = list(msg)
+                del ls_msg[-1]
+                msg = tuple(ls_msg)
+
+        msgg = " ".join(msg)
+        if is_integer(msgg) :
+            search = int(msgg)
+        else :
+            search = mal.AnimeSearch(msgg)
+            search = search.results[0].mal_id
+            print(search)
+        reponse = requests.get(f"https://animethemes-api.herokuapp.com/api/v1/anime/{search}")
+        reponse = reponse.json()
+        r = reponse
+        reponse = reponse["themes"][0]["mirrors"][0]
+        for c , v in reponse.items() :
+            if c == "mirror" :
+                reponse = v
+                break
+        if len(mm) >= 2 :
+            try :
+                int(mm[-1])
+            except :
+                pass
+            else :
+                intt = int(mm[-1])
+                r = reponse[0:-6:]
+                rr = reponse[-5::]
+                reponse = r + str(intt) + rr
+        try :
+            titre = reponse[30:-9:]
+            op = reponse[-8:-5:]
+        except :
+            titre = ""
+            op = ""
+        await ctx.send(titre,delete_after=29.5)
+        await ctx.send(op,delete_after=29)
+        await ctx.send(reponse,delete_after=28.5)
+        print(f"[OP] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> {reponse} | {msgg} | {search}")
