@@ -1,12 +1,13 @@
 import discord
-from discord.ext import commands
+from discord.ext import commands , tasks
 import random
 import time
+import os
+from discord.ext.commands import bot
 from langdetect import detect 
 from translate import Translator
 import requests
-# import youtube_dl
-import os
+import youtube_dl
 import mal
 
 async def delete(self,ctx):
@@ -15,9 +16,6 @@ async def delete(self,ctx):
     else :
         await ctx.message.delete() 
 
-def endSong(self,guild, path):
-    os.remove(path)    
-
 def is_integer(n):
     try:
         float(n)
@@ -25,10 +23,31 @@ def is_integer(n):
         return False
     else:
         return float(n).is_integer()
-
+ydl_opts = {
+'format': 'bestaudio/best',
+'postprocessors': [{
+    'key': 'FFmpegExtractAudio',
+    'preferredcodec': 'mp3',
+    'preferredquality': '512',
+}],
+}
+def newest(path):
+    files = os.listdir(path)
+    paths = [os.path.join(path, basename) for basename in files]
+    return max(paths, key=os.path.getctime)
+    
 class CogCommand(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+        
+    @commands.command()
+    async def val(self,ctx):
+        await delete(self,ctx)
+        path = r"/home/pi/valheim/ftp"
+        map = newest(path)
+        await ctx.send(f"la dernière version de la map est {map[21:-4]}")
+        await ctx.send(file=discord.File(map))
+        print(f"[Valheim] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} ({map[21:]})")
 
     @commands.command()
     async def cal(self,ctx,c :str):
@@ -68,8 +87,6 @@ class CogCommand(commands.Cog):
             await ctx.send(f"{livre}", delete_after=5)
             print(f"[Book] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> {nbr} ")
 
-
-        
     @commands.command()
     async def help(self,ctx):
         await delete(self,ctx)
@@ -137,29 +154,96 @@ class CogCommand(commands.Cog):
         await ctx.send(reponse,delete_after=10)
         print(f"[Meteo] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} {ville} & {jour} ")
 
-    # @commands.command(pass_context=True)
-    # async def p(self,ctx,*url):
-    #     await delete(self,ctx)
-    #     if not ctx.message.author.voice:
-    #         await ctx.send('you are not connected to a voice channel')
-    #         return
-    #     else:
-    #         channel = ctx.message.author.voice.channel
-    #         voice_client = await channel.connect()
-    #         guild = ctx.message.guild
-    #         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-    #             file = ydl.download(url)
-    #         path = str(file['title']) + "-" + str(file['id'] + ".mp3")
+    @commands.command()
+    async def watt(self,ctx,i : float):
+        await delete(self,ctx)
+        watt = ""
+        for c in range(1,24):
+            wh = i*c/1000
+            watt += f"Pour {c} heures : {wh}Wh donc {round(wh*0.16,3)}€\n "
+        watt += "\n"
+        watt += f"Pour 1 jour : {i*24/1000}Wh donc {round((i*24/1000)*0.16,3)}€\n "
+        watt += f"Pour 7 jours : {i*24*7/1000}Wh donc {round((i*24*7/1000)*0.16,3)}€\n "
+        watt += f"Pour 1 mois : {i*24*30.45/1000}Wh donc {round((i*24*30.45/1000)*0.16,3)}€\n "
+        watt += f"Pour 1 an : {i*24*365.25/1000}Wh donc {round((i*24*365.25/1000)*0.16,3)}€\n "
+        watt += f"Pour 10 ans : {i*24*365.25*10/1000}Wh donc {round((i*24*365.25*10/1000)*0.16,3)}€\n "
+        await ctx.send(watt,delete_after=20)
+        print(f"[Watt] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} ({i}) ")
 
-    #         voice_client.play(discord.FFmpegPCMAudio(path), after=lambda x="")
-    #         voice_client.source = discord.PCMVolumeTransformer(voice_client.source, 1)
+    @commands.command(pass_context = True)
+    async def leave(self,ctx):
+        try :
+            await delete("",ctx)
+        except:
+            pass
+        server = ctx.message.guild.voice_client
+        await server.disconnect()
 
-    #         await ctx.send(f'**Music: **{url}')
+    @commands.command(pass_context = True)
+    async def join(self,ctx):
+        try :
+            await delete("",ctx)
+        except:
+            pass
+        if ctx.voice_client is not None :
+            return await ctx.voice_client.move_to(ctx.author.voice.channel)        
+        voice = ctx.author.voice.channel
+        await voice.connect()
 
     @commands.command()
-    async def op(self,ctx,*msg ):
+    async def stop(self,ctx):
+        try :
+            await delete("",ctx)
+        except:
+            pass
+        voice =  discord.utils.get(ctx.bot.voice_clients, guild=ctx.guild)
+        voice.stop()
+
+    @commands.command()
+    async def po(self,ctx,*url):
         await delete(self,ctx)
+        url = " ".join(url)
+        if not ctx.message.author.voice:
+            await ctx.send('co toi à un channel 🍪')
+            return
+        else:
+            url = await CogCommand.op(self,ctx,url,b=True)
+            song_there = os.path.isfile("song.mp3")
+            try:
+                if song_there:
+                    os.remove("song.mp3")
+            except:
+                pass
+            # voice = ctx.author.voice.channel
+            try:
+                # await voice.connect()
+                await CogCommand.join("",ctx)
+            except:
+                pass
+            with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+                ydl.download([url[2]])
+            for file in os.listdir("./"):
+                if file.endswith(".mp3"):
+                    try :
+                        os.rename(file, "song.mp3")
+                    except :
+                        await CogCommand.stop("",ctx)
+                        time.sleep(1)
+                        os.remove("song.mp3")
+                        os.rename(file, "song.mp3")
+            ctx.voice_client.play(discord.FFmpegPCMAudio("song.mp3"))
+            await ctx.send(f'Play: {url[0]} ({url[1]})',delete_after=5)
+
+    @commands.command()
+    async def op(self,ctx,*msg,b: bool = False):
+        if b == False:
+             await delete(self,ctx)
+        # elif b == True :
+        #     print(msg[0])
+        #     msg = eval(msg[0])
+        #     print(msg)
         mm = ""
+        print(msg)
         if len(msg) >= 2 :
             try :
                 int(msg[-1])
@@ -171,10 +255,11 @@ class CogCommand(commands.Cog):
                 del ls_msg[-1]
                 msg = tuple(ls_msg)
         msgg = " ".join(msg)
+        print(msgg)
         if is_integer(msgg) :
             search = int(msgg)
         else :
-            search = mal.AnimeSearch(msgg)
+            search = mal.AnimeSearch(msgg,timeout=10)
             search = search.results[0].mal_id
         print(search)
         reponse = requests.get(f"https://animethemes-api.herokuapp.com/api/v1/anime/{search}")
@@ -184,7 +269,7 @@ class CogCommand(commands.Cog):
             reponse = reponse["themes"][0]["mirrors"][0]
         except :
             await ctx.send(f"J'ai pas trouvé {str(msg)[2:-2:]} 🍉",delete_after=10)
-            print(f"[OP:Erreur] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> erreur : {str(msg)[2:-2:]}")
+            return print(f"[OP:Erreur] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> erreur : {str(msg)[2:-2:]}")
         else:
             for c , v in reponse.items() :
                 if c == "mirror" :
@@ -206,7 +291,11 @@ class CogCommand(commands.Cog):
             except :
                 titre = ""
                 op = ""
-            await ctx.send(titre,delete_after=99.5)
-            await ctx.send(op,delete_after=99)
-            await ctx.send(reponse,delete_after=98.5)
-            print(f"[OP] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> {op} | {titre} | {search}")
+            if b == False:
+                await ctx.send(titre,delete_after=99.5)
+                await ctx.send(op,delete_after=99)
+                await ctx.send(reponse,delete_after=98.5)
+                print(f"[OP] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> {op} | {titre} | {search}")
+            else :
+                print("oui")
+                return (titre,op,reponse)

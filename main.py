@@ -1,9 +1,13 @@
 import time
+from discord.ext.commands.errors import CommandNotFound
 t1 = time.time()
 import discord
-from discord.ext import commands
+from discord.ext import commands ,tasks
 from cogs import commandsPablo 
 import datetime 
+import requests
+today = datetime.datetime.now()
+today = today.strftime("%d/%m/%Y %H:%M:%S")
 bot = commands.Bot(command_prefix="!")
 bot.remove_command("help")
 @bot.event
@@ -16,13 +20,20 @@ async def on_ready():
     print(f"connecté à {len(bot.guilds)} server(s) ")
     print(f"Démarré en {round(tmps,3)} s")
     print('---------------------')
-    today = datetime.datetime.now()
-    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{today} 🐧"))
-    general = bot.get_channel(764558994881904662)
-    await general.connect()
+    printer.start()
+
+@tasks.loop(minutes=5)
+async def printer():
+    reponse = requests.get("http://api.openweathermap.org/data/2.5/weather?q=andresy&appid=0dc100d22eac5b733265582d1b360ba6")
+    meteo = reponse.json()
+    c = meteo["main"]["temp"]
+    c = round(c - 273.15,2)
+    e = meteo["weather"][0]["main"]
+    await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{c}°C | {e} | {today} 🐧"))
+
 
 @bot.event
-async def on_command_error(ctx,error, user : discord.Member):
+async def on_command_error(ctx,error):
     print(f"[Error] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> {error}")
     if isinstance(error, commands.MissingPermissions):
         await ctx.send("Vous n'avez pas les permissions pour faire cette commande. 🤖",delete_after=10)
@@ -30,8 +41,10 @@ async def on_command_error(ctx,error, user : discord.Member):
     elif isinstance(error,commands.MissingRequiredArgument):
         await ctx.send("Il manque un argument. 🤖",delete_after=10)
         await commandsPablo.delete("",ctx)
+    elif CommandNotFound():
+        pass
     else :
-        await ctx.send(f"{user.mention} ooff ça bogue :/ ({error}) ",delete_after=10)
+        await ctx.send(f"ooff ça bogue :/ ({error}) ",delete_after=10)
 
 cogs = [
     commandsPablo.CogCommand(bot),
