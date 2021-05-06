@@ -22,7 +22,7 @@ async def on_ready():
     print('---------------------')
     printer.start()
 
-@tasks.loop(minutes=5)
+@tasks.loop(minutes=2)
 async def printer():
     reponse = requests.get("http://api.openweathermap.org/data/2.5/weather?q=andresy&appid=0dc100d22eac5b733265582d1b360ba6")
     meteo = reponse.json()

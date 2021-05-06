@@ -299,3 +299,11 @@ class CogCommand(commands.Cog):
             else :
                 print("oui")
                 return (titre,op,reponse)
+    
+    @commands.command()
+    async def covid(self,ctx):
+        await delete(self,ctx)
+
+
+
+        print("test")
