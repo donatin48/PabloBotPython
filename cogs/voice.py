@@ -1,6 +1,7 @@
 from cogs.commandsPablo import CogCommand
 import discord
 from discord.ext import commands 
+import requests
 import youtube_dl
 import mal
 import os
