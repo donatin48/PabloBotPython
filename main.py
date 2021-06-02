@@ -8,7 +8,6 @@ import datetime
 import requests
 from cogs import commandsPablo 
 from cogs import voice
-
 today = datetime.datetime.now()
 today = today.strftime("%d/%m/%Y %H:%M:%S")
 bot = commands.Bot(command_prefix="!")
