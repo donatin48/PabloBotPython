@@ -3,12 +3,15 @@ from discord.ext.commands.errors import CommandNotFound
 t1 = time.time()
 import discord
 from discord.ext import commands ,tasks
-from cogs import commandsPablo 
+from discord_slash import SlashCommand
 import datetime 
 import requests
+from cogs import commandsPablo 
+from cogs import voice
 today = datetime.datetime.now()
 today = today.strftime("%d/%m/%Y %H:%M:%S")
 bot = commands.Bot(command_prefix="!")
+slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
 bot.remove_command("help")
 @bot.event
 async def on_ready():
@@ -48,9 +51,10 @@ async def on_command_error(ctx,error):
 
 cogs = [
     commandsPablo.CogCommand(bot),
-    # level.Levels(bot)
+    voice.voice(bot)
 ]
 for cog in cogs :
+    print(f"cog {cog} imported")
     bot.add_cog(cog)
 
 with open("db/config.ini","r",encoding="UTF-8") as r:
