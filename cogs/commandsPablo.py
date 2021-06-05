@@ -8,7 +8,6 @@ from translate import Translator
 from discord_slash import cog_ext, SlashContext
 import requests
 
-
 async def delete(self,ctx):
     if isinstance(ctx.channel, discord.channel.DMChannel) or not ctx.message :
         pass
