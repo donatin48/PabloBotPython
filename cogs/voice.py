@@ -102,10 +102,6 @@ class voice(commands.Cog):
     async def op(self,ctx,*msg,b: bool = False):
         if b == False:
              await delete(self,ctx)
-        # elif b == True :
-        #     print(msg[0])
-        #     msg = eval(msg[0])
-        #     print(msg)
         mm = ""
         print(msg)
         if len(msg) >= 2 :
