@@ -155,7 +155,6 @@ class CogCommand(commands.Cog):
         await ctx.send(watt,delete_after=20)
         print(f"[Watt] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} ({i}) ")
 
-
     @cog_ext.cog_slash(name="watt")
     async def watts(self,ctx,valeur : float):
         await CogCommand.watt(self,ctx,valeur)
