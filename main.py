@@ -8,11 +8,12 @@ import datetime
 import requests
 from cogs import commandsPablo 
 from cogs import voice
+from cogs import admin
 today = datetime.datetime.now()
 today = today.strftime("%d/%m/%Y %H:%M:%S")
-bot = commands.Bot(command_prefix="!")
+bot = commands.Bot(command_prefix="!", help_command=None)
 slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
-bot.remove_command("help")
+
 @bot.event
 async def on_ready():
     tmps = time.time() - t1
@@ -34,7 +35,6 @@ async def printer():
     e = meteo["weather"][0]["main"]
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{c}°C | {e} | {today} 🐧"))
 
-
 @bot.event
 async def on_command_error(ctx,error):
     print(f"[Error] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> {error}")
@@ -52,9 +52,10 @@ async def on_command_error(ctx,error):
 cogs = [
     commandsPablo.CogCommand(bot),
     voice.voice(bot)
+    # admin.Admin(bot)
 ]
 for cog in cogs :
-    print(f"cog {cog} imported")
+    print(f"Cog : {cog.qualified_name} imported")
     bot.add_cog(cog)
 
 with open("db/config.ini","r",encoding="UTF-8") as r:

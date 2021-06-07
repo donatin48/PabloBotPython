@@ -1,4 +1,3 @@
-from cogs.commandsPablo import CogCommand
 import discord
 from discord.ext import commands 
 import requests
@@ -13,14 +12,6 @@ async def delete(self,ctx):
     else :
         await ctx.message.delete() 
         
-def is_integer(n):
-    try:
-        float(n)
-    except ValueError:
-        return False
-    else:
-        return float(n).is_integer()
-
 ydl_opts = {
 'format': 'bestaudio/best',
 'postprocessors': [{
@@ -33,6 +24,9 @@ ydl_opts = {
 class voice(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
+
+    async def recup_lien(self,ctx):
+        pass
 
     @commands.command(pass_context = True)
     async def leave(self,ctx):
@@ -71,7 +65,7 @@ class voice(commands.Cog):
             await ctx.send('co toi à un channel 🍪')
             return
         else:
-            url = await CogCommand.op(self,ctx,url,b=True)
+            url = await voice.op(self,ctx,url)
             song_there = os.path.isfile("song.mp3")
             try:
                 if song_there:
@@ -81,7 +75,7 @@ class voice(commands.Cog):
             # voice = ctx.author.voice.channel
             try:
                 # await voice.connect()
-                await CogCommand.join("",ctx)
+                await voice.join("",ctx)
             except:
                 pass
             with youtube_dl.YoutubeDL(ydl_opts) as ydl:
@@ -91,37 +85,60 @@ class voice(commands.Cog):
                     try :
                         os.rename(file, "song.mp3")
                     except :
-                        await CogCommand.stop("",ctx)
+                        await voice.stop("",ctx)
                         time.sleep(1)
                         os.remove("song.mp3")
                         os.rename(file, "song.mp3")
             ctx.voice_client.play(discord.FFmpegPCMAudio("song.mp3"))
             await ctx.send(f'Play: {url[0]} ({url[1]})',delete_after=5)
 
-    @commands.command()
-    async def op(self,ctx,*msg,b: bool = False):
-        if b == False:
-             await delete(self,ctx)
-        mm = ""
-        print(msg)
-        if len(msg) >= 2 :
-            try :
-                int(msg[-1])
-            except :
+    async def make_list(self,search):
+        l = requests.get(f"https://animethemes-api.herokuapp.com/api/v1/search/anime/{search}").json()
+        if l :
+            title = l[0]["themes"][0]["title"]
+            type = l[0]["themes"][0]["type"]
+            link = l[0]["themes"][0]["mirrors"][0]["mirror"]
+            response = (title,type,link,search)
+            return response
+
+    async def make_list_mal_id(self,search):
+        l = requests.get(f"https://animethemes-api.herokuapp.com/api/v1/anime/{search}").json()
+        if l :
+            try : 
+                title = l[0]["themes"][0]["title"]
+                type = l[0]["themes"][0]["type"]
+                link = l[0]["themes"][0]["mirrors"][0]["mirror"]
+                response = (title,type,link,search)
+                return response
+            except:
                 pass
-            else :
-                mm = msg
-                ls_msg = list(msg)
-                del ls_msg[-1]
-                msg = tuple(ls_msg)
-        msgg = " ".join(msg)
-        print(msgg)
-        if is_integer(msgg) :
-            search = int(msgg)
-        else :
-            search = mal.AnimeSearch(msgg,timeout=10)
+
+    async def print_op(self,ctx,response):
+        await ctx.send(response[0],delete_after=99.5)
+        await ctx.send(response[1],delete_after=99)
+        await ctx.send(response[2],delete_after=98.5)
+        print(f"[OP] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> {response[1]} | {response[0]} | {response[3]}")
+
+    @commands.command()
+    async def op(self,ctx,*,msg):
+        print(msg)
+        response = await voice.make_list(self,msg)
+        if not response :
+            await ctx.send("Pas trouvé : 2ème API (erreurs possibles) ",delete_after=10)
+            search = mal.AnimeSearch(msg,timeout=10)
             search = search.results[0].mal_id
-        print(search)
+            if search:
+                response = await voice.make_list_mal_id(self,search)
+                print(response)
+                if response :
+                    return await voice.print_op(self,ctx,response)
+            await ctx.send(f"J'ai pas trouvé {msg} 🍉",delete_after=10)
+            return print(f"[OP:Erreur] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> erreur : {str(msg)}")
+        print(response)
+        return await voice.print_op(self,ctx,response)
+
+        await delete(self,ctx)
+        mm = ""
         reponse = requests.get(f"https://animethemes-api.herokuapp.com/api/v1/anime/{search}")
         reponse = reponse.json()
         r = reponse
@@ -151,12 +168,8 @@ class voice(commands.Cog):
             except :
                 titre = ""
                 op = ""
-            if b == False:
-                await ctx.send(titre,delete_after=99.5)
-                await ctx.send(op,delete_after=99)
-                await ctx.send(reponse,delete_after=98.5)
-                print(f"[OP] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> {op} | {titre} | {search}")
-            else :
-                print("oui")
-                return (titre,op,reponse)
-            
+            await ctx.send(titre,delete_after=99.5)
+            await ctx.send(op,delete_after=99)
+            await ctx.send(reponse,delete_after=98.5)
+            print(f"[OP] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> {op} | {titre} | {search}")
+                # return (titre,op,reponse)

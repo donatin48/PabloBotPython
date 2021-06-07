@@ -6,6 +6,7 @@ cogs/__pycache__/tictt.cpython-39.pyc
 cogs/level.py
 cogs/__pycache__/level.cpython-39.pyc
 song.mp3
-
+admin.py
+voice_copy.py
 db/db.json
 

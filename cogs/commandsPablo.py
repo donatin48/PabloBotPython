@@ -3,6 +3,7 @@ from discord.ext import commands
 import random
 import time
 import os
+from discord.ext.commands.cog import Cog
 from langdetect import detect 
 from translate import Translator
 from discord_slash import cog_ext, SlashContext
