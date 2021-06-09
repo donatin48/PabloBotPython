@@ -113,7 +113,7 @@ class voice(commands.Cog):
             except:
                 pass
 
-    async def print_op(self,ctx,response):
+    async def print_op(self,ctx,response,number=1):
         await ctx.send(response[0],delete_after=99.5)
         await ctx.send(response[1],delete_after=99)
         await ctx.send(response[2],delete_after=98.5)
@@ -173,3 +173,12 @@ class voice(commands.Cog):
             await ctx.send(reponse,delete_after=98.5)
             print(f"[OP] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> {op} | {titre} | {search}")
                 # return (titre,op,reponse)
+
+    @commands.command()
+    async def opn(self,ctx,*,msg):
+        print(msg)
+        # response = await voice.make_list(self,msg)
+        await ctx.send("Entre le numéro de l'op",delete_after=5)
+        number = await self.bot.wait_for("message",timeout=30)
+        print(number.content)
+        # return await voice.print_op(self,ctx,response)
