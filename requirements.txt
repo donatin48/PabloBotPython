@@ -1,0 +1,8 @@
+
+discord-py-slash-command
+discord.py
+langdetect
+requests
+translate
+youtube-dl
+
