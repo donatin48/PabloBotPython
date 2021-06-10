@@ -2,11 +2,10 @@ import discord
 from discord.ext import commands 
 import requests
 import youtube_dl
-import mal
 import os
 import time
 
-async def delete(self,ctx):
+async def delete(ctx):
     if isinstance(ctx.channel, discord.channel.DMChannel):
         pass
     else :
@@ -31,7 +30,7 @@ class voice(commands.Cog):
     @commands.command(pass_context = True)
     async def leave(self,ctx):
         try :
-            await delete("",ctx)
+            await delete(ctx)
         except:
             pass
         server = ctx.message.guild.voice_client
@@ -40,7 +39,7 @@ class voice(commands.Cog):
     @commands.command(pass_context = True)
     async def join(self,ctx):
         try :
-            await delete("",ctx)
+            await delete(ctx)
         except:
             pass
         if ctx.voice_client is not None :
@@ -51,7 +50,7 @@ class voice(commands.Cog):
     @commands.command()
     async def stop(self,ctx):
         try :
-            await delete("",ctx)
+            await delete(ctx)
         except:
             pass
         voice =  discord.utils.get(ctx.bot.voice_clients, guild=ctx.guild)
@@ -92,28 +91,21 @@ class voice(commands.Cog):
             ctx.voice_client.play(discord.FFmpegPCMAudio("song.mp3"))
             await ctx.send(f'Play: {url[0]} ({url[1]})',delete_after=5)
 
-    async def make_list(self,search):
-        l = requests.get(f"https://animethemes-api.herokuapp.com/api/v1/search/anime/{search}").json()
+    async def make_list(self,search,number=1):
+        # l = requests.get(f"https://animethemes-api.herokuapp.com/api/v1/search/anime/{search}").json()
+        l = requests.get(f"http://127.0.0.1:8000/api/v1/search/anime/{search}").json()
         if l :
             title = l[0]["themes"][0]["title"]
             type = l[0]["themes"][0]["type"]
             link = l[0]["themes"][0]["mirrors"][0]["mirror"]
+            if number != 1:
+                link = link.replace("OP1",f"OP{number}")
+                print(link)
+
             response = (title,type,link,search)
             return response
 
-    async def make_list_mal_id(self,search):
-        l = requests.get(f"https://animethemes-api.herokuapp.com/api/v1/anime/{search}").json()
-        if l :
-            try : 
-                title = l[0]["themes"][0]["title"]
-                type = l[0]["themes"][0]["type"]
-                link = l[0]["themes"][0]["mirrors"][0]["mirror"]
-                response = (title,type,link,search)
-                return response
-            except:
-                pass
-
-    async def print_op(self,ctx,response,number=1):
+    async def print_op(self,ctx,response):
         await ctx.send(response[0],delete_after=99.5)
         await ctx.send(response[1],delete_after=99)
         await ctx.send(response[2],delete_after=98.5)
@@ -121,64 +113,23 @@ class voice(commands.Cog):
 
     @commands.command()
     async def op(self,ctx,*,msg):
+        '''
+        I use https://github.com/LetrixZ/animethemes-api for get data
+        '''
+        await delete(ctx)
         print(msg)
         response = await voice.make_list(self,msg)
         if not response :
-            await ctx.send("Pas trouvé : 2ème API (erreurs possibles) ",delete_after=10)
-            search = mal.AnimeSearch(msg,timeout=10)
-            search = search.results[0].mal_id
-            if search:
-                response = await voice.make_list_mal_id(self,search)
-                print(response)
-                if response :
-                    return await voice.print_op(self,ctx,response)
             await ctx.send(f"J'ai pas trouvé {msg} 🍉",delete_after=10)
             return print(f"[OP:Erreur] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> erreur : {str(msg)}")
         print(response)
         return await voice.print_op(self,ctx,response)
 
-        await delete(self,ctx)
-        mm = ""
-        reponse = requests.get(f"https://animethemes-api.herokuapp.com/api/v1/anime/{search}")
-        reponse = reponse.json()
-        r = reponse
-        try:
-            reponse = reponse["themes"][0]["mirrors"][0]
-        except :
-            await ctx.send(f"J'ai pas trouvé {str(msg)[2:-2:]} 🍉",delete_after=10)
-            return print(f"[OP:Erreur] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> erreur : {str(msg)[2:-2:]}")
-        else:
-            for c , v in reponse.items() :
-                if c == "mirror" :
-                    reponse = v
-                    break
-            if len(mm) >= 2 :
-                try :
-                    int(mm[-1])
-                except :
-                    pass
-                else :
-                    intt = int(mm[-1])
-                    r = reponse[0:-6:]
-                    rr = reponse[-5::]
-                    reponse = r + str(intt) + rr
-            try :
-                titre = reponse[30:-9:]
-                op = reponse[-8:-5:]
-            except :
-                titre = ""
-                op = ""
-            await ctx.send(titre,delete_after=99.5)
-            await ctx.send(op,delete_after=99)
-            await ctx.send(reponse,delete_after=98.5)
-            print(f"[OP] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> {op} | {titre} | {search}")
-                # return (titre,op,reponse)
-
     @commands.command()
     async def opn(self,ctx,*,msg):
         print(msg)
-        # response = await voice.make_list(self,msg)
-        await ctx.send("Entre le numéro de l'op",delete_after=5)
+        await ctx.send(f"Entre le numéro de l'op de {msg}",delete_after=10)
         number = await self.bot.wait_for("message",timeout=30)
+        response = await voice.make_list(self,msg,number.content)
         print(number.content)
-        # return await voice.print_op(self,ctx,response)
+        return await voice.print_op(self,ctx,response)
