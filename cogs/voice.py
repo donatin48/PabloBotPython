@@ -4,7 +4,7 @@ import requests
 import youtube_dl
 import os
 import time
-
+import re
 async def delete(ctx):
     if isinstance(ctx.channel, discord.channel.DMChannel):
         pass
@@ -99,7 +99,14 @@ class voice(commands.Cog):
             type = l[0]["themes"][0]["type"]
             link = l[0]["themes"][0]["mirrors"][0]["mirror"]
             if number != 1:
-                link = link.replace("OP1",f"OP{number}")
+                themes = l[0]["themes"]
+                for theme in themes:
+                    print(theme["type"])
+                    if re.search(f"OP{number}".upper(),theme["type"]):
+                        title = theme["title"]
+                        type = theme["type"]
+                        link = theme["mirrors"][0]["mirror"]
+                        break
                 print(link)
 
             response = (title,type,link,search)
