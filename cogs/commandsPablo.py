@@ -86,7 +86,7 @@ class CogCommand(commands.Cog):
         embed.add_field(name="!dog",value="!dog --> Donne un chien aléatoire ",inline=False)
         embed.add_field(name="!lyr",value="!lyr + artiste + titre --> Donne les lyrics ",inline=False)
         embed.add_field(name="!meteo",value="!meteo + ville + J+? --> Donne la méteo ",inline=False)
-        embed.add_field(name="!op",value="!op + nom (ou id my anime list) --> Donne l'opening ",inline=False)
+        embed.add_field(name="!op",value="!op + nom --> Donne l'opening ",inline=False)
         
         await ctx.send(embed=embed, delete_after=10)
         print(f"[Help] [{time.strftime('%H:%M:%S')}] : {ctx.author.name}")
