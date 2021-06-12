@@ -72,7 +72,7 @@ class voice(commands.Cog):
             print(f"LONGUEUR : {len(themes)}")
             for theme in themes:
                 print(theme["type"])
-                if re.search(f"OP{number}".upper(),theme["type"]):
+                if re.search(f"OP{number}".upper(),theme["type"] or re.search(number,theme["type"]):
                     title = theme["title"]
                     type = theme["type"]
                     link = theme["mirrors"][0]["audio"]
@@ -103,33 +103,6 @@ class voice(commands.Cog):
         # channel = ctx.message.author.voice.channel
         # voice_  = discord.utils.get(ctx.guild.voice_channels, name=channel.name)
         voice_client = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
-        return
-
-        song_there = os.path.isfile("song.mp3")
-        try:
-            if song_there:
-                os.remove("song.mp3")
-        except:
-            pass
-        # voice = ctx.author.voice.channel
-        try:
-            # await voice.connect()
-            await voice.join("",ctx)
-        except:
-            pass
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-            ydl.download([url[2]])
-        for file in os.listdir("./"):
-            if file.endswith(".mp3"):
-                try :
-                    os.rename(file, "song.mp3")
-                except :
-                    await voice.stop("",ctx)
-                    time.sleep(1)
-                    os.remove("song.mp3")
-                    os.rename(file, "song.mp3")
-        ctx.voice_client.play(discord.FFmpegPCMAudio("song.mp3"))
-        await ctx.send(f'Play: {url[0]} ({url[1]})',delete_after=5)
 
     async def make_list(self,search,number=1):
         # l = requests.get(f"https://animethemes-api.herokuapp.com/api/v1/search/anime/{search}").json()
@@ -142,7 +115,7 @@ class voice(commands.Cog):
                 themes = l[0]["themes"]
                 for theme in themes:
                     print(theme["type"])
-                    if re.search(f"OP{number}".upper(),theme["type"]):
+                    if re.search(f"OP{number}".upper(),theme["type"]) or re.search(number,theme["type"]):
                         title = theme["title"]
                         type = theme["type"]
                         link = theme["mirrors"][0]["mirror"]
