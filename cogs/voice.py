@@ -72,7 +72,8 @@ class voice(commands.Cog):
             print(f"LONGUEUR : {len(themes)}")
             for theme in themes:
                 print(theme["type"])
-                if re.search(f"OP{number}".upper(),theme["type"] or re.search(number,theme["type"]):
+                if re.search(f"OP{number}".upper(),theme["type"] or re.search(number,theme["type"])):
+
                     title = theme["title"]
                     type = theme["type"]
                     link = theme["mirrors"][0]["audio"]
