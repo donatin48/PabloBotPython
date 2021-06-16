@@ -72,8 +72,7 @@ class voice(commands.Cog):
             print(f"LONGUEUR : {len(themes)}")
             for theme in themes:
                 print(theme["type"])
-                if re.search(f"OP{number}".upper(),theme["type"] or re.search(number,theme["type"])):
-
+                if re.search(number.upper(),theme["type"] ):
                     title = theme["title"]
                     type = theme["type"]
                     link = theme["mirrors"][0]["audio"]
@@ -100,10 +99,10 @@ class voice(commands.Cog):
         voice_client = ctx.voice_client
         source = FFmpegPCMAudio(response[2])
         voice_client.play(source)
-
+        # voice_client = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
         # channel = ctx.message.author.voice.channel
         # voice_  = discord.utils.get(ctx.guild.voice_channels, name=channel.name)
-        voice_client = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
+        
 
     async def make_list(self,search,number=1):
         # l = requests.get(f"https://animethemes-api.herokuapp.com/api/v1/search/anime/{search}").json()
@@ -116,7 +115,8 @@ class voice(commands.Cog):
                 themes = l[0]["themes"]
                 for theme in themes:
                     print(theme["type"])
-                    if re.search(f"OP{number}".upper(),theme["type"]) or re.search(number,theme["type"]):
+                    # if re.search(f"OP{number}".upper(),theme["type"]) or re.search(number,theme["type"]):
+                    if re.search(number.upper(),theme["type"]):
                         title = theme["title"]
                         type = theme["type"]
                         link = theme["mirrors"][0]["mirror"]
@@ -144,6 +144,9 @@ class voice(commands.Cog):
             await ctx.send(f"J'ai pas trouvé {msg} 🍉",delete_after=10)
             return print(f"[OP:Erreur] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} --> erreur : {str(msg)}")
         print(response)
+        voice_client = ctx.voice_client
+        source = FFmpegPCMAudio(response[2])
+        voice_client.play(source)
         return await voice.print_op(self,ctx,response)
 
     @commands.command()
