@@ -143,14 +143,17 @@ class CogCommand(commands.Cog):
         await delete(self,ctx)
         if search :
             # i = random.randint(0,5000)
-            # res = requests.get(f"https://www.sakugabooru.com/post.json?tags={search}").json()
+            res = requests.get(f"https://www.sakugabooru.com/post.json?tags={search}").json()
         else:
+
             i = random.randint(0,5000)
             res = requests.get(f"https://www.sakugabooru.com/post.json?page={i}").json()
+            
         l = random.randint(0,len(res))
         url = res[l]
         times = time.ctime(int(url["created_at"]))
         times = time.strftime("%Y-%m-%d  %H:%M:%S",time.localtime(int(url["created_at"]))) 
+
         await ctx.send(times,delete_after=30)
         await ctx.send(url["tags"],delete_after=30)
         await ctx.send(url["file_url"],delete_after=30)
