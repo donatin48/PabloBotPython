@@ -76,7 +76,6 @@ class voice(commands.Cog):
                     title = theme["title"]
                     type = theme["type"]
                     link = theme["mirrors"][0]["audio"]
-                    print(link)
                     break
             t3 = time.time()
             print(f"Temps pour trouver {(t3-t2)*1000}ms")
@@ -89,14 +88,12 @@ class voice(commands.Cog):
     @commands.command()
     async def po(self,ctx,*,msg):
         await delete(ctx)
-
-        await ctx.send(f"Entre le numéro de l'op de {msg}",delete_after=10)
+        await ctx.send(f"Entre le numéro de {msg}",delete_after=5)
         number = await self.bot.wait_for("message",timeout=30)
-
         response = await voice.make_list_audio(self,msg,number.content)
-        print(response)
-
         voice_client = ctx.voice_client
+        if not voice_client :
+            voice_client = discord.utils.get(self.bot.voice_clients, guild=ctx.guild)
         source = FFmpegPCMAudio(response[2])
         voice_client.play(source)
         # voice_client = discord.utils.get(self.client.voice_clients, guild=ctx.guild)
@@ -121,8 +118,6 @@ class voice(commands.Cog):
                         type = theme["type"]
                         link = theme["mirrors"][0]["mirror"]
                         break
-                print(link)
-
             response = (title,type,link,search)
             return response
 
