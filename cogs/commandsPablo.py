@@ -110,16 +110,6 @@ class CogCommand(commands.Cog):
         embed.set_image(url=fox['image'])
         await ctx.send(embed=embed,delete_after=10)
         print(f"[Fox] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} ")
-        
-    @commands.command()
-    async def lyr(self,ctx,artist : str, *title):
-        await delete(self,ctx)
-        title = " ".join(title)
-        print(artist,title)
-        reponse = requests.get(f"https://api.lyrics.ovh/v1/{artist}/{title}")
-        lyrics = reponse.json()
-        await ctx.send(lyrics['lyrics'],delete_after=15)
-        print(f"[Lyrics] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} ")
     
     @commands.command()
     async def dog(self,ctx):
@@ -130,13 +120,6 @@ class CogCommand(commands.Cog):
         embed.set_image(url=dog['url'])
         await ctx.send(embed=embed,delete_after=10)
         print(f"[Dog] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} ")
-
-    @commands.command()
-    async def meteo(self,ctx,ville ="andresy",jour =0):
-        await delete(self,ctx)
-        reponse = f"https://www.prevision-meteo.ch/uploads/widget/{ville}_{jour}.png "
-        await ctx.send(reponse,delete_after=10)
-        print(f"[Meteo] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} {ville} & {jour} ")
 
     @commands.command()
     async def watt(self,ctx,i : float):
@@ -154,6 +137,25 @@ class CogCommand(commands.Cog):
         watt += f"Pour 10 ans : {i*24*365.25*10/1000}Wh donc {round((i*24*365.25*10/1000)*0.16,3)}€\n "
         await ctx.send(watt,delete_after=20)
         print(f"[Watt] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} ({i}) ")
+
+    @commands.command()
+    async def sak(self,ctx,search=None):
+        await delete(self,ctx)
+        if search :
+            # i = random.randint(0,5000)
+            # res = requests.get(f"https://www.sakugabooru.com/post.json?tags={search}").json()
+        else:
+            i = random.randint(0,5000)
+            res = requests.get(f"https://www.sakugabooru.com/post.json?page={i}").json()
+        l = random.randint(0,len(res))
+        url = res[l]
+        times = time.ctime(int(url["created_at"]))
+        times = time.strftime("%Y-%m-%d  %H:%M:%S",time.localtime(int(url["created_at"]))) 
+        await ctx.send(times,delete_after=30)
+        await ctx.send(url["tags"],delete_after=30)
+        await ctx.send(url["file_url"],delete_after=30)
+
+        print(f"[Sak] [{time.strftime('%H:%M:%S')}] : {ctx.author.name} {url['file_url']} {url['tags']} {search} ")
 
     @cog_ext.cog_slash(name="watt")
     async def watts(self,ctx,valeur : float):
