@@ -14,6 +14,9 @@ today = today.strftime("%d/%m/%Y %H:%M:%S")
 bot = commands.Bot(command_prefix="!", help_command=None)
 slash = SlashCommand(bot, sync_commands=True, sync_on_cog_reload=True)
 
+from datetime import datetime
+from bs4 import BeautifulSoup
+
 @bot.event
 async def on_ready():
     tmps = time.time() - t1
@@ -34,6 +37,31 @@ async def printer():
     c = round(c - 273.15,2)
     e = meteo["weather"][0]["main"]
     await bot.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name=f"{c}°C | {e} | {today} 🐧"))
+
+async def salebot():
+    chan = bot.get_channel(303520736553992192)
+    url = "https://0781845g.index-education.net/pronote/"
+    send = False
+    msg = "Le site n'est pas disponible."
+    resp = requests.get(url)
+    soup = BeautifulSoup(resp.text, 'html.parser')
+    i = 0
+    try : 
+        for div in soup.find_all(class_="texte"):
+            i += 1
+            if div.text != msg and i==2:
+                send = True
+                print("cbon")
+                await chan.send("CBON <@228937896818638860>")
+                break
+    except:
+        send = True
+    if not send :
+        print(f"ya r {datetime.now()} ")
+        
+@bot.command()
+async def ent():
+    await salebot()
 
 @bot.event
 async def on_command_error(ctx,error):
